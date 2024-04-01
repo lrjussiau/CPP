@@ -33,7 +33,8 @@ int main (int argc, char **argv) {
 
 	file.close();
 
-	std::ofstream outFile(argv[1]);
+	std::ofstream outFile(std::string(argv[1]) + ".replace");
+	// std::ofstream outFile(argv[1]);
     if (!outFile.is_open()) {
         std::cerr << "Error opening file for writing." << std::endl;
         return 1;
