@@ -32,3 +32,13 @@ ScavTrap &ScavTrap::operator=(const ScavTrap &rhs) {
 void    ScavTrap::guardGate() {
     std::cout << "ScavTrap " << this->_name << " is now in Gate keeper mode." << std::endl;
 }
+
+void    ScavTrap::attack(const std::string& target) {
+    if (_energy <= 0)
+    {
+        std::cout << "ScavTrap " << _name << " is out of energy!" << std::endl;
+        return;
+    }
+    std::cout << "ScavTrap " << _name << " burn " << target << ", causing " << _attackDamage << " points of damage!" << std::endl;
+    _energy -= 1;
+}
