@@ -17,7 +17,7 @@ Form& Form::operator=(const Form &src) {
 	return *this;
 }
 
-std::string	Form::getName() {
+std::string	Form::getName() const {
 	return this->_name;
 }
 
@@ -25,16 +25,20 @@ bool	Form::getSigned() {
 	return this->_signed;
 }
 
-int	Form::getGradeToSign() {
+int	Form::getGradeToSign() const {
 	return this->_gradeToSign;
 }
 
-int			Form::getGradeToExec() {
+int	Form::getGradeToExec() const {
 	return this->_gradeToExec;
 }
 
-void		Form::beSigned(Bureaucrat bureaucrat) {
-	if (bureaucrat.getGrade())
+void		Form::beSigned(Bureaucrat &bureaucrat) {
+	if (bureaucrat.getGrade() > this->_gradeToSign)
+		throw GradeTooLowException();
+	else {
+		this->_signed = true;
+	}
 }
 
 std::ostream&   operator<<( std::ostream& o, const Form& rhs ) {

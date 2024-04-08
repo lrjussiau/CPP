@@ -3,7 +3,7 @@
 
 #include "Bureaucrat.hpp"
 
-class Form {
+class AForm {
 
 	private:
 		const std::string	_name;
@@ -12,20 +12,20 @@ class Form {
 		const int			_gradeToExec;
 
 	public:
-		Form(std::string name, int gradeToSign, int gradeToExec);
-		virtual ~Form();
-		Form(const Form &src);
+		AForm(std::string name, int gradeToSign, int gradeToExec);
+		virtual ~AForm();
+		AForm(const AForm &src);
 
-		Form &operator=(const Form &src);
+		AForm &operator=(const AForm &src);
 		std::string	getName() const;
 		bool		getSigned();
 		int			getGradeToSign() const;
 		int			getGradeToExec() const;
 
 		void		beSigned(Bureaucrat &bureaucrat);
-
+		virtual void execute(const Bureaucrat& bureaucrat) const = 0;
 };
 
-std::ostream &  operator<<(std::ostream & o, Form const & rhs);
+std::ostream &  operator<<(std::ostream & o, AForm const & rhs);
 
 #endif

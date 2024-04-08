@@ -4,7 +4,7 @@
 #include <iostream>
 #include <stdexcept>
 
-class Form;
+class AForm;
 
 class Bureaucrat {
 
@@ -25,7 +25,8 @@ class Bureaucrat {
 
 		void		incrementGrade();
 		void		decrementGrade();
-		void		signForm(Form &form);
+		void		signForm(AForm &form);
+		void		executeForm(AForm &form);
 };
 
 std::ostream &  operator<<(std::ostream & o, Bureaucrat const & rhs);
@@ -41,6 +42,13 @@ class GradeTooLowException : public std::exception {
 	public:
 		virtual const char *what() const throw () {
 			return ("Grade too low");
+		}
+};
+
+class IsSignedException : public std::exception {
+	public:
+		virtual const char *what() const throw () {
+			return ("Form is not signed");
 		}
 };
 

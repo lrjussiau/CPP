@@ -41,7 +41,7 @@ void	Bureaucrat::decrementGrade() {
 		this->_grade += 1;
 }
 
-void	Bureaucrat::signForm(Form &form) {
+void	Bureaucrat::signForm(AForm &form) {
 	if (this->_grade > form.getGradeToSign())
 		std::cout << this->_name << " couldn’t sign " << form.getName() << " because grade to low" << std::endl;
 	else if (form.getSigned() == true)	
@@ -51,6 +51,15 @@ void	Bureaucrat::signForm(Form &form) {
 		form.beSigned(*this);
 		std::cout << this->_name << " sign " << form.getName() << std::endl;
 	}
+}
+
+void	Bureaucrat::executeForm(AForm &form) {
+	if (this->_grade > form.getGradeToExec())
+		throw GradeTooLowException();
+	if (form.getSigned() == false)
+		throw IsSignedException();
+	form.execute(*this);
+	std::cout << _name << " execute " << form.getName() << std::endl;
 }
 
 std::ostream &  operator<<(std::ostream & o, const Bureaucrat& rhs) {
