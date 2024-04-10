@@ -9,11 +9,11 @@ const Animal* j = new Dog();
 const Animal* i = new Cat();
 const WrongAnimal* Wani = new WrongAnimal();
 const WrongAnimal* k = new WrongCat();
-
+std::cout << std::endl;
 std::cout << "Dog.getType : " << j->getType() << " " << std::endl;
 std::cout << "Cat.getType : " << i->getType() << " " << std::endl;
 std::cout << "WrongCat.getType : " << k->getType() << " " << std::endl;
-
+std::cout << std::endl;
 std::cout << "Cat sound :" <<std::endl;
 i->makeSound();
 std::cout << "Dog sound :" <<std::endl;
