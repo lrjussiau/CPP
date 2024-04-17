@@ -24,9 +24,9 @@ int main( void )
 
     try {
         std::cout << "Accessing a valid index: " << intArray[5] << std::endl;
-		std::cout << "Accessing a valid index: " << intArray[9] << std::endl;
         std::cout << "Accessing an invalid index: " << intArray[10] << std::endl;
-    } catch ( OutOfBoundsException& e ) {
+    } 
+	catch ( OutOfBoundsException& e ) {
         std::cout << "Error: " << e.what() << std::endl;
     }
 

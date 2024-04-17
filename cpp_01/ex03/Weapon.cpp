@@ -5,6 +5,7 @@ Weapon::Weapon(std::string type) {
 }
 
 Weapon::~Weapon() {
+	std::cout << "lol" << std::endl;
 }
 
 std::string	Weapon::getType(void) const {
