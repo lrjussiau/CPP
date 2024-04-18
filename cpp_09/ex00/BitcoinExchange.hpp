@@ -2,6 +2,8 @@
 # define BITCOINEXCHANGE_H
 
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <map>
 
 class BitcoinExchange
@@ -9,6 +11,16 @@ class BitcoinExchange
 	private:
 
 		std::map<std::string, std::string>	_data;
+		std::map<std::string, std::string>	_str;
+		std::ifstream 		open(std::string);
+		void				getData(void);
+		bool				checkFile(std::string);
+		bool				checkDateFormat(std::string);
+		bool				checkValue(std::string);
+		void				parsingLine(std::string);
+		std::string			getKey(std::map<std::string, std::string> map);
+		std::string			getValue(std::map<std::string, std::string> map);
+		void				processLine(void);
 
 	public:
 		BitcoinExchange();
@@ -18,11 +30,43 @@ class BitcoinExchange
 
 		void	run(std::string);
 
-	//Wrong input
-	//Wrong format (not Date | Value)
-	//Wrong date_format (day > 30 month > 12)
-	//Wrong Date (too early/late) ??
-	//Wrong Value (must be : 0 < value < 1000)
+
+	class WrongInput : public std::exception {
+		public:
+			virtual const char *what() const throw () {
+				return ("Wrong Input, please enter ./btc \"file\"");
+			}
+	};
+	class WrongFormat : public std::exception {
+		public:
+			virtual const char *what() const throw () {
+				return ("Wrong Format, the file must have a format Date | Value");
+			}
+	};
+	class WrongDateFormat : public std::exception {
+		public:
+			virtual const char *what() const throw () {
+				return ("Wrong Date Format, must have YYYY-MM-DD format and follow the rule of years months days");
+			}
+	};
+	class WrongStringFormat : public std::exception {
+		public:
+			virtual const char *what() const throw () {
+				return ("Wrong String Format, must have '|' to separate date and value");
+			}
+	};
+	class WrongDate : public std::exception {
+		public:
+			virtual const char *what() const throw () {
+				return ("Wrong Date, the Year must be beetween 2009 and 2024");
+			}
+	};
+	class WrongValue : public std::exception {
+		public:
+			virtual const char *what() const throw () {
+				return ("Wrong Value, the value must be between 0 and 1000");
+			}
+	};
 };
 
 

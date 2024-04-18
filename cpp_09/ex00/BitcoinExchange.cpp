@@ -13,3 +13,196 @@
 		// Find the ocurence, if not existing take the upper one
 		// print std::cout date << " => " << value << " = " << value * value csv
 	// look for the next line
+
+BitcoinExchange::BitcoinExchange() {}
+
+BitcoinExchange::~BitcoinExchange() {}
+
+BitcoinExchange::BitcoinExchange(const BitcoinExchange &src) {
+	(void)src;
+}
+
+BitcoinExchange &BitcoinExchange::operator=(const BitcoinExchange &src) {
+	(void)src;
+	return *this;
+}
+
+//---------------------------------------//
+//              Open File                //
+//---------------------------------------//
+
+bool BitcoinExchange::checkFile(std::string firstString) {
+	if (firstString.compare("date | value")) {
+		return false;
+	}
+	return true;
+}
+
+std::ifstream	BitcoinExchange::open(std::string input) {
+
+	std::ifstream file(input);
+	if (!file.is_open()) {
+		throw BitcoinExchange::WrongInput();
+	}
+	std::string 		line;
+	std::getline(file, line);
+	if (!BitcoinExchange::checkFile(line)) {
+		throw BitcoinExchange::WrongFormat();
+	}
+	return file;
+}
+
+void	BitcoinExchange::getData(void) {
+	std::ifstream file("data.csv");
+	if (!file.is_open()) {
+		throw BitcoinExchange::WrongInput();
+	}
+	std::string 		line;
+	std::getline(file, line);
+	while (std::getline(file, line)) {
+		size_t separatorPos = line.find(",");
+		std::string date = line.substr(0, separatorPos);
+		std::string value = line.substr(separatorPos + 1, std::string::npos);
+		_data[date]=value;
+	}
+}
+
+//---------------------------------------//
+//             Parsing Line              //
+//---------------------------------------//
+
+bool	BitcoinExchange::checkDateFormat(std::string date) {
+	size_t separatorPos = date.find("-");
+	size_t secondSeparatorPos = date.rfind("-");
+
+	if (separatorPos == std::string::npos || secondSeparatorPos == std::string::npos || separatorPos == secondSeparatorPos)
+        return false;
+
+	std::string year = date.substr(0, separatorPos);
+	std::string month = date.substr(separatorPos + 1, secondSeparatorPos - separatorPos - 1);
+	std::string day = date.substr(secondSeparatorPos + 1, std::string::npos);
+
+	if (year.empty() || month.empty() || day.empty())
+		return false;
+	if (year.size() != 4 && month.size() != 2 && day.size() != 2)
+		return false;
+
+    std::istringstream iss(year);
+    int yearInt;
+
+    if (iss >> yearInt) {
+		if (yearInt < 2009 || yearInt > 2024)
+			throw BitcoinExchange::WrongDate();
+    } else {
+        return false;
+    }
+
+	std::istringstream isf(month);
+	int monthInt;
+	if (isf >> monthInt) {
+		if (monthInt < 1 || monthInt > 12)
+			return false;
+    } else {
+        return false;
+    }
+
+	std::istringstream isb(day);
+	int dayInt;
+	if (isb >> dayInt) {
+		if (dayInt < 1 || dayInt > 31)
+			return false;
+    } else {
+        return false;
+    }
+	return true;
+}
+
+bool	BitcoinExchange::checkValue(std::string value) {
+	std::istringstream isb(value);
+	float valueInt;
+	if (isb >> valueInt) {
+		if (valueInt < 0 || valueInt > 1000)
+			return false;
+    } else {
+        return false;
+    }
+	return true;
+}
+
+void	BitcoinExchange::parsingLine(std::string line) {
+	size_t separatorPos = line.find(" | ");
+    if (separatorPos == std::string::npos) {
+        throw WrongStringFormat();
+    }
+    std::string date = line.substr(0, separatorPos);
+	if (!checkDateFormat(date)) {
+		throw WrongDateFormat();
+	}
+	std::string value = line.substr(separatorPos + 3, std::string::npos);
+	if (!checkValue(value)) {
+		throw WrongValue();
+	}
+	_str[date]=value;
+}
+
+//---------------------------------------//
+//              Process Line             //
+//---------------------------------------//
+
+std::string BitcoinExchange::getKey(std::map<std::string, std::string> map) {
+	std::map<std::string, std::string>::iterator it = map.begin();
+	return it->first;
+}
+
+std::string BitcoinExchange::getValue(std::map<std::string, std::string> map) {
+	std::map<std::string, std::string>::iterator it = map.begin();
+	return it->second;
+}
+
+void	BitcoinExchange::processLine(void) {
+	std::string searchKey = getKey(_str);
+	std::map<std::string, std::string>::iterator it = _data.upper_bound(searchKey);
+    if (it != _data.begin()) {
+        --it;
+		std::istringstream iss(it->second);
+		float searchValue;
+		iss >> searchValue;
+		std::istringstream isf(getValue(_str));
+		float strValue;
+		isf >> strValue;
+		std::cout << searchKey << " => " << strValue << " = " << strValue * searchValue << std::endl;
+    } else {
+        std::cout << "No earlier date found in the data." << std::endl;
+    }
+	_str.clear();
+}
+
+//---------------------------------------//
+//             Run Function              //
+//---------------------------------------//
+
+void	BitcoinExchange::run(std::string input) {
+	try {
+		std::ifstream	file = open(input);
+		std::string 	line;
+		getData();
+		while (std::getline(file, line)) {
+			try {
+				parsingLine(line);
+				processLine();
+			} catch (WrongStringFormat &e) {
+				std::cerr << "Exception caught: " << e.what() << std::endl;
+			} catch (WrongDateFormat &e) {
+				std::cerr << "Exception caught: " << e.what() << std::endl;
+			} catch (WrongDate &e) {
+				std::cerr << "Exception caught: " << e.what() << std::endl;
+			} catch (WrongValue &e) {
+				std::cerr << "Exception caught: " << e.what() << std::endl;
+			}
+		}
+	} catch (WrongInput &e) {
+		std::cerr << "Exception caught: " << e.what() << std::endl;
+	}  catch (WrongFormat &e) {
+		std::cerr << "Exception caught: " << e.what() << std::endl;
+	}
+}
