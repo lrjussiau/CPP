@@ -1,23 +1,4 @@
 #include "PmergeMe.hpp"
-/*
-Ford Johnson
-
-3 step:
-
-1 - Divide the list half and half
-	- Preaty easy 2 container temp
-	- Merge on the final container ??
-
-2 - Sort Each half
-	- Continue to subdivide the list recursivelly until have only 1 or 2 item in each list
-	- Sorting them 
-
-3 - Merge with strategy
-	- Merge them efficiently with binary insertion
-		- find wich part of the list to search etc..until find the right position
-		- Merge all the small part each other until every part is united.
-
-*/
 
 PmergeMe::PmergeMe() {}
 
@@ -55,7 +36,7 @@ void    PmergeMe::inputContainer(std::string str) {
 	int n = stoi(str);
 	if (n < 0)
 		throw WrongInput();
-	_list.push_back(n);
+	_deque.push_back(n);
 	_vector.push_back(n);
 }
 
@@ -128,87 +109,71 @@ void	PmergeMe::sortVector(void) {
 }
 
 //---------------------------------------//
-//             Sorting list              //
+//             Sorting deque             //
 //---------------------------------------//
 
-void	PmergeMe::setList(const std::list<int>& l) { 
-	_list = l; 
+void	PmergeMe::setDeque(const std::deque<int>& v) { 
+	_deque = v; 
 }
 
-std::list<int>    PmergeMe::getList() const {
-	return _list;
+std::deque<int>    PmergeMe::getDeque() const {
+	return _deque;
 }
 
-int PmergeMe::binarySearchInsertList(std::list<int>& lst, int target) {
+int PmergeMe::binarySearchInsertDeque(std::deque<int>& Vec, int target) {
     int low = 0;
-    int high = lst.size() - 1;
+    int high = Vec.size() - 1;
     int mid;
-	std::list<int>::iterator it = lst.begin();
 
     while (low <= high) {
-        mid = (low + (high - low) / 2);
-		std::advance(it, mid);
-        if (*it < target) {
+        mid = low + (high - low) / 2;
+
+        if (Vec[mid] < target) {
             low = mid + 1;
-        } else if (*it > target) {
+        } else if (Vec[mid] > target) {
             high = mid - 1;
         } else {
-			std::cout << target << " lol " << std::endl;
             return mid + 1;
         }
     }
-	std::cout << target << " : " << low << std::endl;
     return low;
 }
 
-void PmergeMe::insertSortedList(std::list<int>& lst, int value) {
-    int index = binarySearchInsertList(lst, value);
-	std::list<int>::iterator it = lst.begin();
-	std::advance(it, index);
-    lst.insert(it, value);
+void PmergeMe::insertSortedDeque(std::deque<int>& vec, int value) {
+    int index = binarySearchInsertDeque(vec, value);
+    vec.insert(vec.begin() + index, value);
 }
 
-std::list<int>	PmergeMe::mergeList(std::list<int> left, std::list<int> right) {
-	std::list<int>::iterator it = right.begin();
-	printElements(left);
-	printElements(right);
-	std::cout << std::endl;
+std::deque<int>	PmergeMe::mergeDeque(std::deque<int> left, std::deque<int> right) {
 	for (int i = 0; i < static_cast<int>(right.size()); i++) {
-		std::cout << right.size() << std::endl;
-		insertSortedList(left, *it);
-		std::advance(it, 1);
+		insertSortedDeque(left, right[i]);
 	}
-	printElements(left);
-	std::cout << std::endl;
-	std::cout << std::endl;
 	return (left);
 }
 
-void	PmergeMe::sortList(void) {
-	if (_list.size() <= 1)
+void	PmergeMe::sortDeque(void) {
+	if (_deque.size() <= 1)
 		return;
 	
-	if (_list.size() == 2) {
-		if (_list.front() > _list.back())
-			std::swap(_list.front(), _list.back());
+	if (_deque.size() == 2) {
+		if (_deque[0] > _deque[1])
+			std::swap(_deque[0], _deque[1]);
 		return;
 	}
 
-	std::list<int>::iterator it = _list.begin();
-	std::advance(it, _list.size() / 2);
-
-    std::list<int> left(_list.begin(), it);
-    std::list<int> right(it, _list.end());
+	size_t mid = _deque.size() / 2;
+    std::deque<int> left(_deque.begin(), _deque.begin() + mid);
+    std::deque<int> right(_deque.begin() + mid, _deque.end());
 
 	PmergeMe 	leftPart;
 	PmergeMe	rightPart;
-	leftPart.setList(left);
-	rightPart.setList(right);
+	leftPart.setDeque(left);
+	rightPart.setDeque(right);
 
-	leftPart.sortList();
-	rightPart.sortList();
+	leftPart.sortDeque();
+	rightPart.sortDeque();
 
-	_list = mergeList(leftPart.getList(), rightPart.getList());
+	_deque = mergeDeque(leftPart.getDeque(), rightPart.getDeque());
 }
 
 //---------------------------------------//
@@ -219,14 +184,23 @@ void	PmergeMe::run(void) {
 	std::cout << "--- Vector ---" << std::endl;
 	std::cout << "Before : ";
 	printElements(_vector);
+	clock_t start = clock();
 	sortVector();
+	clock_t end = clock();
+	_vectorTime = static_cast<double>(end - start) / CLOCKS_PER_SEC * 10000000;
 	std::cout << "After : ";
 	printElements(_vector);
 
-	std::cout << "--- List ---" << std::endl;
+	std::cout << "--- Deque ---" << std::endl;
 	std::cout << "Before : ";
-	printElements(_list);
-	sortList();
+	printElements(_deque);
+	clock_t start1 = clock();
+	sortDeque();
+	clock_t end1 = clock();
+	_dequeTime = static_cast<double>(end1 - start1) / CLOCKS_PER_SEC * 10000000;
 	std::cout << "After : ";
-	printElements(_list);
+	printElements(_deque);
+
+	std::cout << "Time to process a range of " << _vector.size() << " elements with std::vector : " << _vectorTime << " us" << std::endl;
+	std::cout << "Time to process a range of " << _deque.size() << " elements with std::deque : " << _dequeTime << " us" << std::endl;
 }

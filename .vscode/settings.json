@@ -66,6 +66,9 @@
 		"vector": "cpp",
 		"filesystem": "cpp",
 		"list": "cpp",
-		"span": "cpp"
+		"span": "cpp",
+		"__tree": "cpp",
+		"map": "cpp",
+		"__memory": "cpp"
 	}
 }

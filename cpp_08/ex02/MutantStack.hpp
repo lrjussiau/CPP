@@ -15,7 +15,9 @@ class MutantStack : public std::stack<T, Container> {
 	public:
 		MutantStack() {};
 		~MutantStack() {};
-		MutantStack(const MutantStack &src) {*this = src;};
+		MutantStack(const MutantStack &src) {
+			*this = src;
+		};
 		MutantStack &operator=(const MutantStack &src) {
 			std::stack< T, Container >::operator=(src);
         	return *this;
@@ -24,7 +26,7 @@ class MutantStack : public std::stack<T, Container> {
 		typedef typename Container::iterator    iterator;
 
 		iterator	begin() {
-			return this->c.begin()
+			return this->c.begin();
 		};
 		iterator	end() {
 			return this->c.end();

@@ -12,7 +12,7 @@ class BitcoinExchange
 
 		std::map<std::string, std::string>	_data;
 		std::map<std::string, std::string>	_str;
-		std::ifstream 		open(std::string);
+		int					stoi(std::string);
 		void				getData(void);
 		bool				checkFile(std::string);
 		bool				checkDateFormat(std::string);
@@ -65,6 +65,12 @@ class BitcoinExchange
 		public:
 			virtual const char *what() const throw () {
 				return ("Wrong Value, the value must be between 0 and 1000");
+			}
+	};
+	class FailedConvert : public std::exception {
+		public:
+			virtual const char *what() const throw () {
+				return ("Fail Convert, string to int failed to convert");
 			}
 	};
 };

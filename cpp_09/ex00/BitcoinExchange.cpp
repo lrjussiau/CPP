@@ -38,20 +38,6 @@ bool BitcoinExchange::checkFile(std::string firstString) {
 	return true;
 }
 
-std::ifstream	BitcoinExchange::open(std::string input) {
-
-	std::ifstream file(input);
-	if (!file.is_open()) {
-		throw BitcoinExchange::WrongInput();
-	}
-	std::string 		line;
-	std::getline(file, line);
-	if (!BitcoinExchange::checkFile(line)) {
-		throw BitcoinExchange::WrongFormat();
-	}
-	return file;
-}
-
 void	BitcoinExchange::getData(void) {
 	std::ifstream file("data.csv");
 	if (!file.is_open()) {
@@ -71,6 +57,16 @@ void	BitcoinExchange::getData(void) {
 //             Parsing Line              //
 //---------------------------------------//
 
+int		BitcoinExchange::stoi(std::string str) {
+	std::istringstream iss(str);
+	int	strInt;
+	if (iss >> strInt) {
+		return strInt;
+	}
+	throw BitcoinExchange::FailedConvert();
+	return 0;
+}
+
 bool	BitcoinExchange::checkDateFormat(std::string date) {
 	size_t separatorPos = date.find("-");
 	size_t secondSeparatorPos = date.rfind("-");
@@ -87,33 +83,22 @@ bool	BitcoinExchange::checkDateFormat(std::string date) {
 	if (year.size() != 4 && month.size() != 2 && day.size() != 2)
 		return false;
 
-    std::istringstream iss(year);
-    int yearInt;
+    int yearInt = stoi(year);
+	int monthInt = stoi(month);
+	int dayInt = stoi(day);
 
-    if (iss >> yearInt) {
-		if (yearInt < 2009 || yearInt > 2024)
-			throw BitcoinExchange::WrongDate();
-    } else {
-        return false;
-    }
+	if (yearInt < 2009 || yearInt > 2024)
+		throw BitcoinExchange::WrongDate();
+	if (monthInt < 1 || monthInt > 12)
+		return false;
 
-	std::istringstream isf(month);
-	int monthInt;
-	if (isf >> monthInt) {
-		if (monthInt < 1 || monthInt > 12)
-			return false;
-    } else {
-        return false;
-    }
+	if ((monthInt == 1 || monthInt == 3 || monthInt == 5 || monthInt == 7 || monthInt == 8 || monthInt == 10 || monthInt == 12) && (dayInt < 1 || dayInt > 31))
+		return false;
+	if ((monthInt == 4 || monthInt == 6 || monthInt == 9 || monthInt == 11) && (dayInt < 1 || dayInt > 30))
+		return false;
+	if ((monthInt == 2) && (dayInt < 1 || dayInt > 29))
+		return false;
 
-	std::istringstream isb(day);
-	int dayInt;
-	if (isb >> dayInt) {
-		if (dayInt < 1 || dayInt > 31)
-			return false;
-    } else {
-        return false;
-    }
 	return true;
 }
 
@@ -183,8 +168,15 @@ void	BitcoinExchange::processLine(void) {
 
 void	BitcoinExchange::run(std::string input) {
 	try {
-		std::ifstream	file = open(input);
-		std::string 	line;
+		std::ifstream file(input);
+		if (!file.is_open()) {
+			throw BitcoinExchange::WrongInput();
+		}
+		std::string 		line;
+		std::getline(file, line);
+		if (!BitcoinExchange::checkFile(line)) {
+			throw BitcoinExchange::WrongFormat();
+		}
 		getData();
 		while (std::getline(file, line)) {
 			try {
@@ -197,6 +189,8 @@ void	BitcoinExchange::run(std::string input) {
 			} catch (WrongDate &e) {
 				std::cerr << "Exception caught: " << e.what() << std::endl;
 			} catch (WrongValue &e) {
+				std::cerr << "Exception caught: " << e.what() << std::endl;
+			} catch (FailedConvert &e) {
 				std::cerr << "Exception caught: " << e.what() << std::endl;
 			}
 		}

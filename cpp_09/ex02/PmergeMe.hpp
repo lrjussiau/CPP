@@ -1,19 +1,22 @@
 #ifndef PMERGEME_H
 # define PMERGEME_H
 
-#include <list>
+#include <deque>
 #include <vector>
 #include <iostream>
 #include <sstream>
 #include <utility>
 #include <iterator>
+#include <ctime>
 
 class PmergeMe {
 
     private:
 
-        std::list<int>      _list;
+        std::deque<int>     _deque;
+        double              _dequeTime;
         std::vector<int>    _vector;
+        double              _vectorTime;
 
         int     stoi(std::string);
 
@@ -24,12 +27,12 @@ class PmergeMe {
         void                insertSortedVector(std::vector<int>& vec, int value);
         int                 binarySearchInsertVector(std::vector<int>& Vec, int target);
 
-        void                sortList();
-        void                setList(const std::list<int>& l);
-        std::list<int>      getList() const;
-        std::list<int>      mergeList(std::list<int> left, std::list<int> right);
-        void                insertSortedList(std::list<int>& lst, int value);
-        int                 binarySearchInsertList(std::list<int>& lst, int target);
+        void                sortDeque();
+        void                setDeque(const std::deque<int>& l);
+        std::deque<int>     getDeque() const;
+        std::deque<int>     mergeDeque(std::deque<int> left, std::deque<int> right);
+        void                insertSortedDeque(std::deque<int>& lst, int value);
+        int                 binarySearchInsertDeque(std::deque<int>& lst, int target);
 
     public:
 

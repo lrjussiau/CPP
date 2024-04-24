@@ -18,8 +18,6 @@ int main (int argc, char **argv) {
         }
     }
 
-    merge.run();
-
-    
+    merge.run();    
     return 0;
 }
